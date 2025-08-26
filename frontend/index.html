@@ -1,26 +1,19 @@
 <!DOCTYPE html>
 <html>
-<head><title>Employee Check-In</title></head>
-<body>
-  <h1>Check-In/Out</h1>
-  <input id="userId" placeholder="Enter Employee ID" />
-  <button onclick="checkIn()">Check-In</button>
-  <button onclick="checkOut()">Check-Out</button>
-  <p id="message"></p>
+  <head>
+    <title>Employee Attendance</title>
+  </head>
+  <body>
+    <h1>Employee Check-in</h1>
+    <button onclick="loadEmployees()">Load Employees</button>
+    <pre id="output"></pre>
 
-  <script>
-    async function checkIn() {
-      const userId = document.getElementById("userId").value;
-      const res = await fetch("http://localhost:5000/attendance/checkin", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId })
-      });
-      const data = await res.json();
-      document.getElementById("message").innerText =
-        "Check-In Successful at " + data.timestamp;
-    }
-  </script>
-</body>
+    <script>
+      async function loadEmployees() {
+        const res = await fetch("http://localhost:3000/employees");
+        const data = await res.json();
+        document.getElementById("output").textContent = JSON.stringify(data, null, 2);
+      }
+    </script>
+  </body>
 </html>
-
