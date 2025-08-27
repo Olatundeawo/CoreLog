@@ -1,16 +1,27 @@
-const { app, BrowserWindow } = require("electron");
+import { app, BrowserWindow } from 'electron';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 function createWindow() {
   const win = new BrowserWindow({
-    width: 600,
-    height: 400,
+    width: 1000,
+    height: 700,
     webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false,
+      preload: path.join(__dirname, 'preload.js'),
     },
   });
-  win.loadFile("index.html");
+  
+  win.loadURL('http://localhost:5173/'); // development
+  // if (process.env.NODE_ENV === 'development') {
+  // } else {
+  //   // win.loadFile(path.join(__dirname, 'frontend-app/dist/index.html')); //  production build
+  // }
 }
+
+
 
 app.whenReady().then(() => {
   createWindow();
