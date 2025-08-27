@@ -1,59 +1,60 @@
+import e from 'express';
 import express from 'express'
 
 export default function (prisma) {
     const router = express.Router();
 
-    // Create
+    // Check in
+    router.post('/checkin', async (req, res) => {
+        const { empolyeeId, checkInPic } = req.body
 
-    router.post('/', async (req, res) => {
         try {
+            const employee = await prisma.employee.findUnique({
+                where: {id: empolyeeId}
+            })
+            if(!employee) {
+                return res.status(400).json({message:"You are not on the payroll"})
+            }
+
+            const activeAttendance = await prisma.attendance.findFirst({
+                where :{empolyeeId, checkOut: null}
+            })
+
+            if (activeAttendance) {
+                return res.status(400).json({message: "You have already checkIn"})
+            }
+
             const attendance = await prisma.attendance.create({
-                data: req.body
-            });
-            res.json(attendance)
-        } catch (err) {
-            res.status(500).json({error: err.message})
+                data: {empolyeeId, checkIn: new Date(), checkInPic, verified: false}
+            })
+            res.json({message: "You have been checkIn ", attendance})
+        } catch(err) {
+            res.status(500).json({message: err.message})
         }
     });
 
-    // Read all
+    // Check out
 
-    router.get('/', async(res, req) => {
-        const attendances = await prisma.attendance.findMany({
-            include: { employee: true}
-        });
-        res.json(attendances)
-    })
+    router.post('/checkout', async( req, res) => {
+        const { empolyeeId, checkOutPic} = req.body
 
-    // Read one
-    router.get('/:id', async (req, res) => {
-        const { id } = req.params;
-        const record = await prisma.attendance.findUnique({
-            where: {id: Number(id)},
-            include: { employee: true}
-        });
-        res.json(record);
-    });
+        try {
+            const employee = await prisma.employee.findUnique({where: {id: empolyeeId}})
+            if (!employee) {res.status(404).json({message: "You are not on pay rol"})}
 
-    // Update
-    router.put('/:id', async (req, res) => {
-        const { id } = req.params;
-        const update = await prisma.attendance.update({
-            where: {id: Number(id)},
-            data: req.body
-        });
-        res.json(update)
-    });
-
-    // Delete
-    router.delete('/:id', async(req, res) => {
-        const { id } = req.params;
-        await prisma.attendance.delete({
-            where: {
-                id: Number(id)
+            const activeAttendance = await prisma.attendance.findFirst({where: {empolyeeId, checkOut:null}})
+            if(!activeAttendance) {
+                res.status(404).json({message:"You have not checkIn"})
             }
-        });
-        res.json({ message: 'Attendance deleted'})
+
+            const updateAttendance = await prisma.attendance.update({
+                where: {id: activeAttendance.id},
+                data: {checkOut: new Date(), checkOutPic}
+            })
+            res.json({message: "checkout succesfully", attendance: updateAttendance})
+        } catch(err) {
+            res.status(500).json({message: err.message})
+        }
     })
 
     return router;
