@@ -54,3 +54,13 @@ model Admin {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+
+// Licence code
+model LicenseCode {
+  id          Int       @id @default(autoincrement())
+  code        String    @unique
+  used        Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  usedBy      String?
+}
