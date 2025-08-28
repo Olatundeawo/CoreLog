@@ -1,9 +1,11 @@
 import EmployeeAttendance from "./components/attendance";
+import ActivationPage from "./components/activationPage";
 
 function App() {
   return (
     <div>
-      <EmployeeAttendance />
+      {/* <EmployeeAttendance /> */}
+      <ActivationPage />
     </div>
   );
 }
