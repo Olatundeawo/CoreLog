@@ -1,37 +1,69 @@
-import { app, BrowserWindow } from 'electron';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import { app, BrowserWindow, ipcMain } from "electron";
+import path from "path";
+import { fileURLToPath } from "url";
+import fs from "fs";
+import fetch from "node-fetch"; // make sure to install: npm install node-fetch
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+let configPath = path.join(app.getPath("userData"), "myappconfig.json");
+
+function isActivated() {
+  if (!fs.existsSync(configPath)) return false;
+  const data = JSON.parse(fs.readFileSync(configPath));
+  return data.activated === true;
+}
+
+function saveActivation() {
+  fs.writeFileSync(configPath, JSON.stringify({ activated: true }));
+}
 
 function createWindow() {
   const win = new BrowserWindow({
     width: 1000,
     height: 700,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
+      preload: path.join(__dirname, "preload.js"),
     },
   });
-  
-  win.loadURL('http://localhost:5173/'); // development
-  // if (process.env.NODE_ENV === 'development') {
-  // } else {
-  //   // win.loadFile(path.join(__dirname, 'frontend-app/dist/index.html')); //  production build
-  // }
+
+  if (isActivated()) {
+    win.loadURL("http://localhost:5173/");
+  } else {
+    win.loadURL("http://localhost:5173/activation");
+  }
 }
 
+// Handle activation
+ipcMain.handle("activate-license", async (event, code) => {
+  try {
+    const res = await fetch("http://localhost:3000/license/activate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code })
+    });
 
+    const data = await res.json();
 
-app.whenReady().then(() => {
-  createWindow();
-
-  app.on('activate', function () {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow();
-  });
+    if (data.success) {
+      saveActivation();
+      return { success: true };
+    } else {
+      return { success: false, message: data.message };
+    }
+  } catch (err) {
+    console.error("Activation error:", err);
+    return { success: false, message: "Could not reach server" };
+  }
 });
 
-app.on('window-all-closed', function () {
-  if (process.platform !== 'darwin') app.quit();
+ipcMain.handle("check-activation", async () => {
+  return isActivated();
 });
 
+app.whenReady().then(createWindow);
+
+app.on("window-all-closed", () => {
+  if (process.platform !== "darwin") app.quit();
+});
