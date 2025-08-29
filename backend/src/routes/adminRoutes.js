@@ -5,17 +5,27 @@ export default function(prisma) {
     const router = express.Router()
 
     // Create admin
-    router.post('/', async (req, res) => {
+    router.post('/create', async (req, res) => {
         try {
-            const { username, email, password } = req.body;
+            const { username, email, password, code } = req.body;
+            
+            if (!username || !email || !password || !code) {
+                return res.status(400).json({success: false, error: "Field is required"})
+            }
             const hashedPassword = await bcrypt.hash(password,10)
-
+            const license = await prisma.licenseCode.findUnique({
+                where: { code }
+            })
+            if (!license) {
+                return res.status(400).json({success:false, error: "Invalid code"})
+            }
             const admin = await prisma.admin.create({
                 data: { username, email, password: hashedPassword}
             });
-            res.json(admin);
+            res.json({success: true, message: "Admin successfully registered", admin});
         } catch (err) {
-            res.status(500).json({ error: err. message})
+            console.error("❌ Backend error:", err);
+            res.status(500).json({ success: false, error: err.message})
         }
     });
 
