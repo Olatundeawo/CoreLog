@@ -9,7 +9,7 @@ function ActivationPage() {
       const res = await fetch("http://localhost:3000/license/activate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code, machineId: "MY_DEVICE_ID" }), // 👈 add real device ID later
+        body: JSON.stringify({ code, machineId: "MY_DEVICE_ID" }),
       });
 
       const data = await res.json();
