@@ -7,12 +7,16 @@ import adminRoutes from './routes/adminRoutes.js';
 import attendanceRoutes from './routes/attendanceRoutes.js';
 import licenseRoutes from './routes/licenseRoutes.js';
 
+
 dotenv.config();
 
 const app = express();
 const prisma = new PrismaClient();
 
 app.use(express.json());
+
+app.use('/uploads', express.static('uploads'));
+
 
 app.use(cors());
 
