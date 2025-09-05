@@ -17,11 +17,12 @@ datasource db {
 // Employee Table
 
 model Employee {
-  id            Int           @id @default(autoincrement())
+  id            Int           @id @default(uuid())
   firstName     String
   lastName      String
   email         String        @unique
   role          String        @default("staff")
+  embedding     Json
   profilePic    String?
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
@@ -31,7 +32,7 @@ model Employee {
 // Attendance Table
 
 model Attendance {
-  id              Int         @id @default(autoincrement())
+  id              Int         @id @default(uuid())
   employeeId      Int
   checkIn         DateTime    @default(now())
   checkOut        DateTime?
@@ -40,6 +41,7 @@ model Attendance {
   checkOutPic     String?
   verified        Boolean     @default(false)
   createdAt       DateTime    @default(now())
+  synced          Boolean     @default(false)
 
   employee        Employee    @relation(fields: [employeeId], references: [id])
 }
