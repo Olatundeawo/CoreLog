@@ -1,7 +1,11 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
-})
+  assetsInclude: ["**/*.wasm"], // optional, helps bundler know to include wasm
+  server: {
+    port: 5175, // optional, whatever port you use
+  },
+});
+
