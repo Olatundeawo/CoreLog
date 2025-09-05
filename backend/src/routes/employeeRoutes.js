@@ -1,14 +1,17 @@
 import express from 'express';
+import upload from './upload.js'
 
 export default function (prisma) {
     const router = express.Router();
 
     // Create
 
-    router.post('/', async (req, res) => {
+    router.post('/',upload.single('photo'), async (req, res) => {
+        const { firstName, lastName, email, embedding } = req.body
+        const photoUrl = req.file ? `/uploads/${req.file.filename}` : null
         try {
             const employee = await prisma.employee.create({
-                data: req.body
+                data: {firstName,lastName,email, embedding:typeof embedding === "String" ? JSON.parse(embedding): embedding,profilePic:photoUrl}
             });
             res.json(employee);
         } catch (err) {
