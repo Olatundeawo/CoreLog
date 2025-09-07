@@ -11,9 +11,10 @@ import licenseRoutes from './routes/licenseRoutes.js';
 dotenv.config();
 
 const app = express();
+app.use(express.json());
+
 const prisma = new PrismaClient();
 
-app.use(express.json());
 
 app.use('/uploads', express.static('uploads'));
 
