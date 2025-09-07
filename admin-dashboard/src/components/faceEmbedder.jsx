@@ -11,7 +11,8 @@ export default function FaceEmbedder() {
   const [preview, setPreview] = useState(null);
   const [embedding, setEmbedding] = useState(null);
 
-  async function handleCapture() {
+  async function handleCapture(e) {
+    e.preventDefault();
     if (!session) return alert("ONNX model not loaded yet");
     if (!faceReady) return alert("Face-API not ready");
 
