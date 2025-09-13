@@ -4,7 +4,7 @@ import useOnnxSession from "../hook/onnxSeesion";
 import useFaceApi from "../hook/useFaceApi";
 import { imageData } from "../hook/preprocess";
 
-export default function FaceEmbedder() {
+export default function FaceEmbedder({ onEmbed }) {
   const { session, loading: onnxLoading } = useOnnxSession();
   const { ready: faceReady, faceapi } = useFaceApi();
   const webcamRef = useRef(null);
@@ -53,6 +53,13 @@ export default function FaceEmbedder() {
       const output = out[session.outputNames[0]].data;
       setEmbedding(Array.from(output).slice(0, 16));
       console.log("embedding length:", output.length);
+
+      if (onEmbed) {
+        onEmbed({
+          profilePic: canvas.toDataURL("image/jpeg"),
+          embedding: Array.from(output),
+        });
+      }
     };
   }
 
