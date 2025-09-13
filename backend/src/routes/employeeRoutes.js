@@ -6,16 +6,17 @@ export default function (prisma) {
 
     // Create
 
-    router.post('/create',upload.single('photo'), async (req, res) => {
+    router.post('/create',upload.single('profilePic'), async (req, res) => {
         const { firstName, lastName, email, embedding } = req.body
         const photoUrl = req.file ? `/uploads/${req.file.filename}` : null
         try {
             const employee = await prisma.employee.create({
-                data: {firstName,lastName,email, embedding:typeof embedding === "String" ? JSON.parse(embedding): embedding,profilePic:photoUrl}
+                data: {firstName,lastName,email, embedding:typeof embedding === "string" ? JSON.parse(embedding) : embedding,profilePic:photoUrl}
             });
             res.json({success: true, message: "Employee Succcesfully created",employee});
         } catch (err) {
             res.status(500).json({success: false, error: err.message})
+            console.error("Error:", err)
         }
     });
 
