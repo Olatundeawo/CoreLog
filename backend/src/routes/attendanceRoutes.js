@@ -6,18 +6,18 @@ export default function (prisma) {
 
     // Check in
     router.post('/checkin', async (req, res) => {
-        const { empolyeeId, checkInPic } = req.body
+        const { employeeId, checkInPic } = req.body
 
         try {
             const employee = await prisma.employee.findUnique({
-                where: {id: empolyeeId}
+                where: {id: employeeId}
             })
             if(!employee) {
                 return res.status(400).json({message:"You are not on the payroll"})
             }
 
             const activeAttendance = await prisma.attendance.findFirst({
-                where :{empolyeeId, checkOut: null}
+                where :{employeeId, checkOut: null}
             })
 
             if (activeAttendance) {
@@ -25,7 +25,7 @@ export default function (prisma) {
             }
 
             const attendance = await prisma.attendance.create({
-                data: {empolyeeId, checkIn: new Date(), checkInPic, verified: false}
+                data: {employeeId, checkIn: new Date(), checkInPic, verified: false}
             })
             res.json({message: "You have been checkIn ", attendance})
         } catch(err) {
@@ -36,13 +36,13 @@ export default function (prisma) {
     // Check out
 
     router.post('/checkout', async( req, res) => {
-        const { empolyeeId, checkOutPic} = req.body
+        const { employeeId, checkOutPic} = req.body
 
         try {
-            const employee = await prisma.employee.findUnique({where: {id: empolyeeId}})
+            const employee = await prisma.employee.findUnique({where: {id: employeeId}})
             if (!employee) {res.status(404).json({message: "You are not on pay rol"})}
 
-            const activeAttendance = await prisma.attendance.findFirst({where: {empolyeeId, checkOut:null}})
+            const activeAttendance = await prisma.attendance.findFirst({where: {employeeId, checkOut:null}})
             if(!activeAttendance) {
                 res.status(404).json({message:"You have not checkIn"})
             }
