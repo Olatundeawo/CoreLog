@@ -41,7 +41,10 @@ function EmployeeCreate() {
 
     if (employee.profilePic) {
       const blob = await fetch(employee.profilePic).then((res) => res.blob());
-      data.append("profilePic", blob);
+      data.append("profilePic", blob, employee.firstName);
+      console.log(blob);
+    } else {
+      console.log("Not profile pic detected");
     }
 
     try {
@@ -49,7 +52,7 @@ function EmployeeCreate() {
         method: "POST",
         body: data,
       });
-      console.log("This is the result:", result);
+      console.log("This is the data:", data);
       const res = await result.json();
       console.log("Realy result", res);
       if (!res.ok) {
@@ -58,8 +61,8 @@ function EmployeeCreate() {
           firstName: "",
           lastName: "",
           email: "",
-          embedding: "",
-          profilePic: "",
+          embedding: null,
+          profilePic: null,
         });
         return;
       }
@@ -68,8 +71,8 @@ function EmployeeCreate() {
         firstName: "",
         lastName: "",
         email: "",
-        embedding: "",
-        profilePic: "",
+        embedding: null,
+        profilePic: null,
       });
     } catch (err) {
       console.log(err);
@@ -104,7 +107,7 @@ function EmployeeCreate() {
           value={employee.email}
           onChange={handleChanges}
         />
-        <FaceEmbedder onSave={handleImage} />
+        <FaceEmbedder onEmbed={handleImage} />
 
         <button type="submit">Register Employee</button>
       </form>
