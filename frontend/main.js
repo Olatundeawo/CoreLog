@@ -29,9 +29,9 @@ function createWindow() {
   });
 
   if (isActivated()) {
-    win.loadURL("http://localhost:5173/");
+    win.loadURL("http://localhost:5174/");
   } else {
-    win.loadURL("http://localhost:5173/activation");
+    win.loadURL("http://localhost:5174/");
   }
 }
 
