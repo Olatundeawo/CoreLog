@@ -34,6 +34,9 @@ export default function (prisma) {
             where: { id: Number(id)},
             include: { attendances: true }
         });
+        if (!employee) {
+            return res.status(404).json({message: "You are not on the payroll"})
+        }
         res.json(employee);
     })
 
@@ -45,15 +48,21 @@ export default function (prisma) {
             where: { id: Number(id)},
             data: req.body
         });
+        if (!updated) {
+            return res.status(404).json({message: "Employee not updated"})
+        }
         res.json(updated);
     })
 
     //  Delete
     router.delete('/:id', async (req, res) => {
         const { id } = req.params;
-        await prisma.employee.delete({
+        const deleted = await prisma.employee.delete({
             where: {id: Number(id)}
         });
+        if (!deleted) {
+            return res.status(404).json({message: "Employee not deleted"})
+        }
         res.json({message: 'Employee deleted successfully'})
     });
 
